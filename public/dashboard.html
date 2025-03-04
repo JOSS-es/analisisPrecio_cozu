@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Precios de Productos</title>
+
+    <!-- Cargar Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Enlazar el archivo CSS externo -->
+    <link rel="stylesheet" href="/styles.css">
+
+    <!-- Cargar Plotly -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- Cargar jQuery y Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+</head>
+<body>
+
+    <!-- Logo -->
+    <div>
+        <img src="/assets/OIP.png" alt="Logo" class="logo">
+    </div>
+
+    <!-- Título de la página -->
+    <h1>📈 Análisis de Precios de Productos</h1>
+
+    <!-- Contenedor del Dropdown centrado -->
+    <div class="dropdown-container">
+        <select id="dropdown-producto"></select>
+    </div>
+
+    <!-- Gráfico de Precios -->
+    <div id="grafico"></div>
+
+    <!-- Botón para regresar a la gráfica de cambios por mes -->
+    <div class="center-button-container">
+        <button id="btn-regresar" class="btn btn-primary" style="display: none;">Regresar a ver cambios de Precio por mes</button>
+    </div>
+
+    <!-- Tabla de datos -->
+    <div class="table-responsive">
+        <table id="tabla-datos">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Usuario</th>
+                    <th>Precio Máximo</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Define la URL base del servidor (cambia esto según sea necesario)
+        const serverURL = 'http://192.168.1.80:3000'; // Cambia esta IP según la IP de tu servidor
+
+        async function cargarProductos() {
+            const response = await fetch(`${serverURL}/productos`);
+            const productos = await response.json();
+            const dropdown = $("#dropdown-producto");
+
+            // Filtrar productos que contienen "NO USAR"
+            const productosFiltrados = productos.filter(prod => !prod.Desc_Esp.toLowerCase().includes("no usar"));
+
+            // Agregar opciones al dropdown
+            dropdown.empty().append('<option></option>'); // Vaciar y agregar opción vacía inicial
+            productosFiltrados.forEach(prod => {
+                dropdown.append(new Option(`${prod.Desc_Esp} (${prod.Cod_Art})`, prod.Cod_Art));
+            });
+
+            // Activar Select2 en el dropdown
+            dropdown.select2({
+                placeholder: "🔍 Escribe para buscar un producto",
+                width: "100%",
+                allowClear: true
+            });
+
+            // Evento para cargar precios al seleccionar un producto
+            dropdown.on("change", function() {
+                cargarPrecios($(this).val());
+            });
+        }
+
+        async function cargarPrecios(codigo) {
+            const response = await fetch(`${serverURL}/precios/${codigo}`);
+            const precios = await response.json();
+
+            // Obtener las fechas y precios
+            const fechas = precios.map(p => p.Fecha.split("T")[0]);
+            const preciosMax = precios.map(p => p.PrecioMax);
+
+            // Crear gráfico con Plotly
+            const data = [{
+                x: fechas,
+                y: preciosMax,
+                type: "scatter",
+                mode: "lines+markers",
+                marker: { color: "red" }
+            }];
+
+            const layout = {
+                title: `Evolución de Precios`,
+                xaxis: { title: "Fecha" },
+                yaxis: { title: "Precio Máximo" },
+                autosize: true,
+                font: { family: 'Arial, sans-serif', size: 14 },
+                template: 'plotly-dark',
+            };
+
+            Plotly.newPlot("grafico", data, layout);
+
+            // Crear la tabla con los datos
+            const tablaBody = document.querySelector("#tabla-datos tbody");
+            tablaBody.innerHTML = ""; // Limpiar tabla antes de agregar nuevos datos
+
+            precios.forEach(p => {
+                const row = document.createElement("tr");
+                row.innerHTML = `  
+                    <td>${p.Codigo}</td>
+                    <td>${p.Fecha.split("T")[0]}</td>
+                    <td>${p.Usuario}</td>
+                    <td>${p.PrecioMax}</td>
+                `;
+                tablaBody.appendChild(row);
+            });
+
+            // Mostrar el botón "Regresar" cuando se muestre la gráfica de precios
+            document.getElementById("btn-regresar").style.display = "block";
+            document.getElementById("tabla-datos").style.display = "table";  // Mostrar la tabla de datos
+        }
+
+        // Función para cargar la gráfica de cambios por mes (inicial)
+        async function cargarCambiosPorMes() {
+            const response = await fetch(`${serverURL}/cambios-precio-mensuales`);
+            const cambios = await response.json();
+
+            // Extraer los datos de cambios por mes
+            const meses = cambios.map(c => `${c.Mes}/${c.Año}`);  // Mes/Año (por ejemplo: 01/2025)
+            const cambiosDePrecio = cambios.map(c => c.CambiosDePrecioMax);
+
+            // Definir una lista de colores para las barras
+            const colores = [
+                'rgba(255, 99, 132, 0.6)', // Rojo
+                'rgba(54, 162, 235, 0.6)', // Azul
+                'rgba(255, 206, 86, 0.6)', // Amarillo
+                'rgba(75, 192, 192, 0.6)', // Verde
+                'rgba(153, 102, 255, 0.6)', // Púrpura
+                'rgba(255, 159, 64, 0.6)', // Naranja
+            ];
+
+            // Asignar colores cíclicamente a las barras
+            const coloresMeses = meses.map((mes, index) => colores[index % colores.length]);
+
+            // Crear gráfico de barras con Plotly
+            const data = [{
+                x: meses,
+                y: cambiosDePrecio,
+                type: 'bar',  // Tipo de gráfico: barras
+                marker: {
+                    color: coloresMeses,  // Asignar un color diferente para cada mes
+                    line: {
+                        color: 'rgba(81, 82, 82, 0.774);',  // Color del borde de las barras
+                        width: 2  // Ancho del borde
+                    }
+                },
+                opacity: 0.8,
+                width: 0.3,  // Hacer las barras más delgadas
+            }];
+
+            const layout = {
+                title: 'Cambios de Precio por Mes',
+                xaxis: {
+                    title: 'Mes/Año',
+                    tickangle: -45,  // Rotar etiquetas de los meses para mayor legibilidad
+                    tickmode: 'array',
+                },
+                yaxis: {
+                    title: 'Número de Cambios de Precio',
+                    tickformat: 'd',  // Mostrar solo números enteros
+                },
+                showlegend: false,
+                font: { family: 'Arial, sans-serif', size: 14 },
+                paper_bgcolor: '#f9f9f9',  // Color de fondo de la gráfica
+                plot_bgcolor: '#ffffff',   // Color de fondo del área de la gráfica
+            };
+
+            Plotly.newPlot("grafico", data, layout);  // Mostrar la gráfica en el div con id="grafico"
+
+            // Ocultar el botón "Regresar" cuando se está viendo la gráfica de barras
+            document.getElementById("btn-regresar").style.display = "none";
+            document.getElementById("tabla-datos").style.display = "none";  // Ocultar la tabla de datos
+        }
+
+        // Función para volver a la gráfica de barras (cuando se hace clic en "Regresar")
+        document.getElementById("btn-regresar").addEventListener("click", function() {
+            // Volver a cargar la gráfica de cambios por mes
+            cargarCambiosPorMes();
+        });
+
+        // Cargar los productos y la gráfica de cambios por mes al cargar la página
+        $(document).ready(function () {
+            cargarProductos();
+            cargarCambiosPorMes();  // Cargar la gráfica de barras por defecto al principio
+        });
+    </script>
+
+</body>
+</html>

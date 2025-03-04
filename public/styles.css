@@ -1,0 +1,243 @@
+/* Estilos CSS para la página */
+body {
+    background-color: #343a40;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    font-size: 35px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Estilo para el logo en la esquina superior izquierda */
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border-style: solid;
+    border-color: rgba(76, 154, 255, 0.774);
+}
+
+/* Contenedor del Dropdown centrado */
+.dropdown-container {
+    width: 50%;
+    margin: 10px auto;
+    color: #343a40;
+    background-color: #6c757d;
+}
+
+/* Gráfico responsivo */
+#grafico {
+    width: 100%;
+    height: 400px; /* Establecer una altura por defecto */
+    max-width: 900px; /* Mantener un ancho máximo para grandes pantallas */
+    margin: 30px auto;
+}
+
+/* Tabla de datos - Hacerla responsiva */
+.table-responsive {
+    overflow-x: auto; /* Permitir desplazamiento horizontal en pantallas pequeñas */
+    margin-top: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #495057;
+    border-radius: 8px;  /* Esquinas redondeadas para la tabla */
+    overflow: hidden;    /* Asegurarse de que las celdas no se desborden */
+}
+
+table th, table td {
+    padding: 12px 8px; /* Aumentar el padding para mejorar la legibilidad */
+    text-align: left;
+    border: 1px solid #ced4da;
+    word-wrap: break-word; /* Evitar que el texto se desborde */
+}
+
+table th {
+    background-color: #6c757d;
+}
+
+/* Hover en la tabla */
+table tr:hover {
+    background-color: #6c757d;
+}
+
+/* Estilos para Select2 en modo oscuro */
+.select2-container .select2-selection--single {
+    background-color: #495057; /* Color de fondo del dropdown */
+    color: #fff; /* Color del texto */
+    border: 1px solid #6c757d;
+    padding: 25px;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    color: #fff; /* Color del texto dentro del dropdown */
+}
+
+.select2-container .select2-dropdown {
+    background-color: #495057; /* Fondo del menú desplegable */
+    color: #fff;
+    border: 1px solid #6c757d;
+    border-radius: 10px;
+}
+
+.select2-results__option {
+    color: #fff; /* Color del texto en las opciones */
+}
+
+.select2-results__option--highlighted {
+    background-color: #6c757d !important; /* Fondo resaltado */
+    color: #b1b1b1 !important; /* Color del texto resaltado */
+}
+
+/* Centrar el botón en la página */
+#btn-regresar {
+    display: block; /* El botón se muestra */
+    margin: 20px auto; /* Centrado horizontal y espacio superior e inferior */
+}
+
+/* Contenedor del botón para centrarlo */
+.center-button-container {
+    text-align: center;  /* Centra el botón horizontalmente */
+    margin-top: 30px;  /* Espacio superior para separar del gráfico */
+}
+
+/* Responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 28px;
+    }
+
+    .logo {
+        width: 100px; /* Reducir el tamaño del logo */
+        height: 100px;
+        top: 10px;
+        left: 10px;
+    }
+
+    .dropdown-container {
+        width: 80%;
+    }
+
+    /* Ajuste del gráfico para pantallas más pequeñas */
+    #grafico {
+        height: 250px; /* Reducir la altura en pantallas pequeñas */
+    }
+
+    /* Mejorar la responsividad de la tabla */
+    table th, table td {
+        font-size: 12px;  /* Reducir el tamaño de la fuente en pantallas pequeñas */
+        padding: 8px 4px;  /* Reducir el padding para ahorrar espacio */
+    }
+
+    table {
+        font-size: 12px;  /* Tamaño de fuente más pequeño en dispositivos móviles */
+    }
+
+    /* Ajustar el botón de regresar para pantallas pequeñas */
+    #btn-regresar {
+        width: 90%;  /* Asegurar que el botón no se vea muy pequeño */
+        font-size: 16px; /* Aumentar el tamaño de la fuente en pantallas pequeñas */
+        padding: 10px; /* Mejorar el padding para mayor clicabilidad */
+    }
+}
+
+@media (max-width: 425px) {
+    h1 {
+        font-size: 24px;  /* Reducir el tamaño del título */
+    }
+
+    .logo {
+        width: 80px; /* Reducir aún más el logo */
+        height: 80px;
+        top: 10px;
+        left: 10px;
+    }
+
+    /* Ajustar la gráfica para pantallas más pequeñas */
+    #grafico {
+        height: 220px; /* Reducir aún más la altura del gráfico */
+    }
+
+    /* Mejorar la tabla */
+    table th, table td {
+        font-size: 10px;  /* Asegurar que la fuente sea legible */
+        padding: 6px 3px;  /* Reducir el padding para pantallas más pequeñas */
+    }
+
+    table {
+        font-size: 10px;
+    }
+
+    /* Ajustar el botón */
+    #btn-regresar {
+        width: 100%;  /* Asegurar que el botón ocupe todo el ancho disponible */
+        font-size: 14px;  /* Ajustar el tamaño de la fuente */
+    }
+}
+
+@media (max-width: 375px) {
+    h1 {
+        font-size: 22px;  /* Título aún más pequeño en pantallas muy pequeñas */
+    }
+
+    .logo {
+        width: 70px;
+        height: 70px;
+        top: 10px;
+        left: 10px;
+    }
+
+    #grafico {
+        height: 200px;  /* Ajustar altura del gráfico */
+    }
+
+    table th, table td {
+        font-size: 9px;
+        padding: 4px 2px;
+    }
+
+    #btn-regresar {
+        font-size: 12px;
+        width: 100%;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 320px) {
+    h1 {
+        font-size: 20px;  /* Reducir aún más el tamaño del título */
+    }
+
+    .logo {
+        width: 60px;  /* Logo más pequeño */
+        height: 60px;
+        top: 10px;
+        left: 10px;
+    }
+
+    #grafico {
+        height: 180px;  /* Ajustar más el gráfico para pantallas ultra pequeñas */
+    }
+
+    table th, table td {
+        font-size: 8px;  /* Reducir aún más el tamaño de la fuente */
+        padding: 4px 2px;
+    }
+
+    #btn-regresar {
+        font-size: 12px;
+        width: 100%;  /* Asegurar que el botón ocupe todo el ancho disponible */
+        padding: 8px;
+    }
+}
+
+
+
